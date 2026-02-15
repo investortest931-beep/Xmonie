@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deposit Funds | XMONIE</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #020617; }
+        .glass-card { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(51, 65, 85, 0.5); }
+    </style>
+</head>
+<body class="text-slate-100 min-h-screen">
+
+    <!-- Header -->
+    <header class="p-6 flex items-center gap-4 border-b border-slate-800 bg-slate-950/50 sticky top-0 z-40 backdrop-blur-md">
+        <a href="dashboard.html" class="p-2 bg-slate-900 rounded-xl">
+            <i data-lucide="arrow-left" class="w-5 h-5 text-slate-400"></i>
+        </a>
+        <h1 class="text-xl font-bold">Add Funds</h1>
+    </header>
+
+    <main class="p-6 max-w-xl mx-auto pb-32">
+        
+        <!-- Step 1: Input Amount -->
+        <section id="inputSection" class="space-y-6">
+            <div class="bg-slate-900 border border-slate-800 rounded-[2.5rem] p-8">
+                <div class="flex flex-col items-center text-center mb-8">
+                    <div class="w-16 h-16 bg-green-600/10 text-green-500 rounded-full flex items-center justify-center mb-4">
+                        <i data-lucide="wallet" class="w-8 h-8"></i>
+                    </div>
+                    <h2 class="text-xl font-bold">How much?</h2>
+                    <p class="text-slate-500 text-sm mt-1">Min deposit is ₦200</p>
+                </div>
+
+                <div class="space-y-4">
+                    <div class="relative">
+                        <span class="absolute left-6 top-1/2 -translate-y-1/2 text-2xl font-bold text-slate-500">₦</span>
+                        <input type="number" id="depositAmount" placeholder="0.00" 
+                            class="w-full bg-slate-950 border border-slate-800 rounded-3xl px-12 py-6 text-3xl font-black text-white focus:border-green-600 outline-none transition-all">
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-2">
+                        <button onclick="setAmount(500)" class="bg-slate-800/50 hover:bg-slate-800 py-3 rounded-xl text-sm font-bold border border-slate-700">₦500</button>
+                        <button onclick="setAmount(1000)" class="bg-slate-800/50 hover:bg-slate-800 py-3 rounded-xl text-sm font-bold border border-slate-700">₦1,000</button>
+                        <button onclick="setAmount(5000)" class="bg-slate-800/50 hover:bg-slate-800 py-3 rounded-xl text-sm font-bold border border-slate-700">₦5,000</button>
+                    </div>
+                </div>
+            </div>
+
+            <button onclick="showDetails()" class="w-full bg-green-600 hover:bg-green-500 py-5 rounded-[2rem] font-black text-lg shadow-xl shadow-green-900/20 transition-all active:scale-95">
+                Continue to Payment
+            </button>
+        </section>
+
+        <!-- Step 2: Payment Details -->
+        <section id="detailSection" class="hidden animate-in slide-in-from-bottom duration-500">
+            <div class="glass-card rounded-[2.5rem] p-8 border-green-500/30">
+                <div class="text-center mb-8">
+                    <h3 class="text-slate-400 font-bold uppercase text-xs tracking-widest mb-2">Transfer Exactly</h3>
+                    <h2 class="text-4xl font-black text-green-500">₦<span id="confirmAmount">0.00</span></h2>
+                </div>
+
+                <div class="space-y-4">
+                    <div class="bg-slate-950/50 p-6 rounded-3xl border border-slate-800 space-y-4">
+                        <div class="flex flex-col">
+                            <span class="text-[10px] font-bold text-slate-500 uppercase">Bank Name</span>
+                            <span class="text-lg font-bold">Palm pay</span>
+                        </div>
+                        <div class="flex flex-col relative">
+                            <span class="text-[10px] font-bold text-slate-500 uppercase">Account Number</span>
+                            <div class="flex items-center justify-between">
+                                <span class="text-2xl font-black tracking-wider text-white" id="accNo">7070735202</span>
+                                <button onclick="copyAcc()" class="p-2 bg-green-600/10 text-green-500 rounded-lg hover:bg-green-600/20 transition-colors">
+                                    <i data-lucide="copy" class="w-5 h-5"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="text-[10px] font-bold text-slate-500 uppercase">Account Name</span>
+                            <span class="text-sm font-bold text-slate-300">Emmanuel Onyedikachukwu James</span>
+                        </div>
+                    </div>
+
+                    <div class="p-4 bg-amber-500/10 border border-amber-500/20 rounded-2xl flex gap-3">
+                        <i data-lucide="alert-circle" class="w-5 h-5 text-amber-500 shrink-0"></i>
+                        <p class="text-[11px] text-amber-200/80 leading-relaxed">
+                            Transfer the exact amount shown above. After payment, click "I've Sent the Money" to notify our admin for verification.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-8 space-y-3">
+                <button id="submitBtn" onclick="submitDeposit()" class="w-full bg-green-600 py-5 rounded-[2rem] font-black text-lg shadow-xl shadow-green-900/20">
+                    I've Sent the Money
+                </button>
+                <button onclick="resetView()" class="w-full py-4 text-slate-500 font-bold hover:text-white transition-colors">
+                    Go Back
+                </button>
+            </div>
+        </section>
+
+        <!-- Step 3: Success -->
+        <section id="successSection" class="hidden text-center py-12">
+            <div class="w-24 h-24 bg-green-500/10 text-green-500 rounded-full flex items-center justify-center mx-auto mb-8 animate-bounce">
+                <i data-lucide="clock" class="w-12 h-12"></i>
+            </div>
+            <h2 class="text-3xl font-black mb-4">Verification Sent!</h2>
+            <p class="text-slate-400 mb-10 leading-relaxed">
+                We've received your request. Your balance will be updated automatically once our admin confirms your transfer.
+            </p>
+            <a href="dashboard.html" class="inline-block bg-slate-800 px-10 py-4 rounded-2xl font-bold hover:bg-slate-700 transition-all">
+                Back to Dashboard
+            </a>
+        </section>
+    </main>
+
+    <script>
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyA1hyI0cIzZajT3_SB1FM0-pCW2uAc6Kyfu-HQp21TM8S7MtwMnQ3F1ClKnyV6Rnn-OQ/exec';
+        let session = JSON.parse(localStorage.getItem('XMONIE'));
+        
+        if (!session) window.location.href = 'login.html';
+        lucide.createIcons();
+
+        function setAmount(amt) {
+            document.getElementById('depositAmount').value = amt;
+        }
+
+        function showDetails() {
+            const amt = document.getElementById('depositAmount').value;
+            if (!amt || amt < 200) {
+                alert("Minimum deposit is ₦200");
+                return;
+            }
+            document.getElementById('confirmAmount').innerText = Number(amt).toLocaleString();
+            document.getElementById('inputSection').classList.add('hidden');
+            document.getElementById('detailSection').classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function resetView() {
+            document.getElementById('detailSection').classList.add('hidden');
+            document.getElementById('inputSection').classList.remove('hidden');
+        }
+
+        function copyAcc() {
+            const acc = document.getElementById('accNo').innerText;
+            const el = document.createElement('textarea');
+            el.value = acc;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+            alert("Account Number Copied!");
+        }
+
+        async function submitDeposit() {
+            const amt = document.getElementById('depositAmount').value;
+            const btn = document.getElementById('submitBtn');
+            
+            btn.disabled = true;
+            btn.innerHTML = `<span class="animate-spin inline-block w-5 h-5 border-b-2 border-white rounded-full mr-2"></span> Submitting...`;
+
+            try {
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        action: 'submitDeposit',
+                        data: {
+                            userId: session.user.uid,
+                            amount: amt
+                        }
+                    })
+                });
+
+                const result = await response.json();
+                if (result.status === 'success') {
+                    document.getElementById('detailSection').classList.add('hidden');
+                    document.getElementById('successSection').classList.remove('hidden');
+                } else {
+                    alert(result.message);
+                    btn.disabled = false;
+                    btn.innerText = "I've Sent the Money";
+                }
+            } catch (err) {
+                alert("Network error. Please try again.");
+                btn.disabled = false;
+                btn.innerText = "I've Sent the Money";
+            }
+        }
+    </script>
+</body>
+</html>

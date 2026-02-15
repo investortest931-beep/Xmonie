@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exam Pins | XMONIE</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #020617; }
+        .exam-card.selected { border-color: #22c55e; background: rgba(34, 197, 94, 0.1); transform: translateY(-4px); }
+        .pulse-loader { animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+    </style>
+</head>
+<body class="text-slate-100 min-h-screen">
+
+    <!-- Header -->
+    <header class="p-6 flex items-center justify-between border-b border-slate-800 bg-slate-950/50 sticky top-0 z-40 backdrop-blur-md">
+        <div class="flex items-center gap-4">
+            <a href="dashboard.html" class="p-2 bg-slate-900 rounded-xl">
+                <i data-lucide="arrow-left" class="w-5 h-5 text-slate-400"></i>
+            </a>
+            <h1 class="text-xl font-bold">Exam Result Pins</h1>
+        </div>
+        <div class="bg-green-600/10 px-4 py-1.5 rounded-full border border-green-600/20">
+            <span class="text-green-500 text-xs font-bold">₦<span id="topBalance">0.00</span></span>
+        </div>
+    </header>
+
+    <main class="p-6 max-w-xl mx-auto pb-32">
+        <section id="formSection">
+            <h3 class="text-xs font-bold uppercase tracking-widest text-slate-500 mb-6 flex items-center gap-2">
+                <i data-lucide="graduation-cap" class="w-4 h-4"></i> Available Examinations
+            </h3>
+
+            <!-- Exam Grid -->
+            <div id="examGrid" class="grid grid-cols-1 gap-4 mb-8">
+                <!-- Skeletons -->
+                <div class="bg-slate-900 h-24 rounded-[2rem] pulse-loader"></div>
+                <div class="bg-slate-900 h-24 rounded-[2rem] pulse-loader"></div>
+            </div>
+
+            <!-- Confirmation Area (Hidden until selected) -->
+            <div id="purchaseAction" class="hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <div class="bg-slate-900 border border-slate-800 rounded-[2.5rem] p-8 text-center mb-6">
+                    <p class="text-slate-400 text-sm mb-2">You have selected</p>
+                    <h2 id="selectedTitle" class="text-2xl font-black text-white mb-1">---</h2>
+                    <p id="selectedType" class="text-green-500 font-bold text-xs uppercase tracking-widest mb-6">---</p>
+                    
+                    <div class="h-px bg-slate-800 w-full mb-6"></div>
+                    
+                    <div class="flex justify-between items-center px-4">
+                        <span class="text-slate-500 font-bold uppercase text-[10px]">Price</span>
+                        <span class="text-2xl font-black text-white">₦<span id="selectedPrice">0.00</span></span>
+                    </div>
+                </div>
+
+                <button id="buyBtn" onclick="handlePurchase()" class="w-full bg-green-600 hover:bg-green-500 text-white py-5 rounded-[2rem] font-bold text-lg shadow-xl shadow-green-900/20 flex items-center justify-center gap-3 transition-all active:scale-95">
+                    <i data-lucide="unlock" class="w-5 h-5"></i> Buy Pin Now
+                </button>
+                <p class="text-center text-[10px] text-slate-500 mt-4 px-8 uppercase font-bold tracking-tight">
+                    Pin will be sent to your registered email and phone number within 5-10 minutes.
+                </p>
+            </div>
+        </section>
+
+        <!-- Receipt Section -->
+        <section id="receiptSection" class="hidden">
+            <div class="bg-slate-900 rounded-[3rem] border border-slate-800 p-8 text-center">
+                <div class="w-20 h-20 bg-green-500/10 text-green-500 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <i data-lucide="check-circle" class="w-10 h-10"></i>
+                </div>
+                <h2 class="text-2xl font-black mb-1">Order Received</h2>
+                <p class="text-slate-500 text-sm mb-8 font-medium">Processing your pin generation...</p>
+                
+                <div class="bg-slate-950 rounded-3xl p-6 text-left space-y-4 my-8 border border-slate-800">
+                    <div class="flex justify-between text-sm"><span class="text-slate-500">Receipt ID</span><span id="recId" class="text-slate-300 font-mono font-bold"></span></div>
+                    <div class="flex justify-between text-sm"><span class="text-slate-500">Examination</span><span id="recExam" class="text-white font-bold"></span></div>
+                    <div class="flex justify-between text-sm"><span class="text-slate-500">Pin Type</span><span id="recType" class="text-white font-bold"></span></div>
+                    <div class="h-px bg-slate-800"></div>
+                    <div class="flex justify-between items-center"><span class="text-slate-400 font-bold uppercase text-xs">Paid</span><span id="recAmount" class="text-2xl font-black text-green-500"></span></div>
+                </div>
+
+                <button onclick="window.location.href='dashboard.html'" class="w-full py-5 rounded-[2rem] bg-slate-800 text-white font-bold hover:bg-slate-700 transition">
+                    Return to Dashboard
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzbghBH8UTsYybTGM8l3AzL7Y4l2ph1tQsBwRxlIA2gPdE06t363_IiT3LRtiVlvLyuQg/exec';
+        let session = JSON.parse(localStorage.getItem('XMONIE'));
+        let selectedPin = null;
+
+        if (!session) window.location.href = 'login.html';
+
+        document.getElementById('topBalance').innerText = Number(session.user.balance).toLocaleString();
+        lucide.createIcons();
+
+        async function loadExamPins() {
+            try {
+                const res = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'getExamPins' })
+                });
+                const result = await res.json();
+                if (result.status === 'success') {
+                    renderExams(result.data);
+                }
+            } catch (e) { console.error(e); }
+        }
+
+        function renderExams(pins) {
+            const grid = document.getElementById('examGrid');
+            grid.innerHTML = pins.map(p => `
+                <div onclick="selectExam(${JSON.stringify(p).replace(/"/g, '&quot;')}, this)" 
+                     class="exam-card bg-slate-900 border border-slate-800 rounded-[2rem] p-5 flex items-center gap-5 cursor-pointer transition-all hover:bg-slate-800 shadow-lg">
+                    <div class="w-16 h-16 bg-white rounded-2xl p-2 flex-shrink-0">
+                        <img src="${p.icon}" class="w-full h-full object-contain">
+                    </div>
+                    <div class="flex-grow">
+                        <h4 class="font-black text-lg leading-none mb-1">${p.examName}</h4>
+                        <p class="text-xs text-slate-500 font-bold uppercase tracking-widest">${p.type}</p>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-green-500 font-black">₦${Number(p.price).toLocaleString()}</span>
+                        <div class="text-[10px] text-slate-600 font-bold uppercase mt-1">Select</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function selectExam(pin, el) {
+            selectedPin = pin;
+            document.querySelectorAll('.exam-card').forEach(c => c.classList.remove('selected'));
+            el.classList.add('selected');
+
+            document.getElementById('selectedTitle').innerText = pin.examName;
+            document.getElementById('selectedType').innerText = pin.type;
+            document.getElementById('selectedPrice').innerText = Number(pin.price).toLocaleString();
+            
+            document.getElementById('purchaseAction').classList.remove('hidden');
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        }
+
+        async function handlePurchase() {
+            if (!selectedPin) return;
+            if (selectedPin.price > session.user.balance) {
+                alert("Insufficient wallet balance!");
+                return;
+            }
+
+            const btn = document.getElementById('buyBtn');
+            btn.disabled = true;
+            btn.innerHTML = `<span class="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"></span> Securing Order...`;
+
+            try {
+                const res = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        action: 'purchaseExamPin',
+                        data: {
+                            userId: session.user.uid,
+                            examId: selectedPin.id,
+                            examName: selectedPin.examName,
+                            pinType: selectedPin.type,
+                            price: selectedPin.price
+                        }
+                    })
+                });
+                
+                const result = await res.json();
+                if (result.status === 'success') {
+                    session.user.balance = result.newBalance;
+                    localStorage.setItem('XMONIE', JSON.stringify(session));
+                    showReceipt(result.receipt);
+                } else {
+                    alert(result.message);
+                    resetBtn();
+                }
+            } catch (err) {
+                alert("Network timeout. Please try again.");
+                resetBtn();
+            }
+        }
+
+        function resetBtn() {
+            const btn = document.getElementById('buyBtn');
+            btn.disabled = false;
+            btn.innerHTML = `<i data-lucide="unlock" class="w-5 h-5"></i> Buy Pin Now`;
+            lucide.createIcons();
+        }
+
+        function showReceipt(r) {
+            document.getElementById('formSection').classList.add('hidden');
+            document.getElementById('receiptSection').classList.remove('hidden');
+            document.getElementById('recId').innerText = r.id;
+            document.getElementById('recExam').innerText = r.exam;
+            document.getElementById('recType').innerText = r.type;
+            document.getElementById('recAmount').innerText = `₦${Number(r.amount).toLocaleString()}`;
+            lucide.createIcons();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        loadExamPins();
+    </script>
+</body>
+</html>

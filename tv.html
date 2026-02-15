@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TV Subscription | XMONIE</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #020617; }
+        .nav-card.active { border-color: #22c55e; background: rgba(34, 197, 94, 0.1); transform: scale(1.05); }
+        select { appearance: none; -webkit-appearance: none; }
+    </style>
+</head>
+<body class="text-slate-100 min-h-screen">
+
+    <header class="p-6 flex items-center justify-between border-b border-slate-800 bg-slate-950/50 sticky top-0 z-40 backdrop-blur-md">
+        <div class="flex items-center gap-4">
+            <a href="dashboard.html" class="p-2 bg-slate-900 rounded-xl"><i data-lucide="arrow-left" class="w-5 h-5 text-slate-400"></i></a>
+            <h1 class="text-xl font-bold text-white">Cable TV</h1>
+        </div>
+        <div class="bg-green-600/10 px-4 py-1.5 rounded-full border border-green-600/20">
+            <span class="text-green-500 text-xs font-bold">₦<span id="balanceText">0.00</span></span>
+        </div>
+    </header>
+
+    <main class="p-6 max-w-xl mx-auto pb-32">
+        <section id="mainSection">
+            <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-4">Choose Provider</h3>
+            
+            <!-- Provider Grid -->
+            <div class="grid grid-cols-4 gap-3 mb-8">
+                <button onclick="filterByProvider('Dstv', this)" class="nav-card bg-white rounded-2xl p-2 h-16 flex items-center justify-center border-2 border-transparent transition-all">
+                    <img src="dstv.jpg" class="max-h-full">
+                </button>
+                <button onclick="filterByProvider('Gotv', this)" class="nav-card bg-white rounded-2xl p-2 h-16 flex items-center justify-center border-2 border-transparent transition-all">
+                    <img src="gotv.jpg" class="max-h-full">
+                </button>
+                <button onclick="filterByProvider('Startimes', this)" class="nav-card bg-white rounded-2xl p-2 h-16 flex items-center justify-center border-2 border-transparent transition-all">
+                    <img src="Startimes.jpg" class="max-h-full">
+                </button>
+                <button onclick="filterByProvider('Showmax', this)" class="nav-card bg-white rounded-2xl p-2 h-16 flex items-center justify-center border-2 border-transparent transition-all">
+                    <img src="showmax.jpg" class="max-h-full">
+                </button>
+            </div>
+
+            <form id="tvForm" class="space-y-6 opacity-30 pointer-events-none transition-opacity duration-300">
+                <div class="bg-slate-900 border border-slate-800 rounded-[2rem] p-6 space-y-6">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-3 ml-1">Select Plan</label>
+                        <div class="relative">
+                            <select id="planSelect" required onchange="handlePlanChange()" class="w-full bg-slate-950 border border-slate-800 rounded-2xl px-5 py-4 focus:border-green-500 outline-none text-white font-bold">
+                                <option value="">Select a package...</option>
+                            </select>
+                            <i data-lucide="chevron-down" class="absolute right-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500"></i>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-3 ml-1">SmartCard / IUC Number</label>
+                        <input type="number" id="iucNumber" required placeholder="Enter IUC Number" class="w-full bg-slate-950 border border-slate-800 rounded-2xl px-5 py-4 focus:border-green-500 outline-none text-white font-bold">
+                    </div>
+
+                    <div class="bg-slate-950 p-5 rounded-2xl border border-dashed border-slate-800 flex justify-between items-center">
+                        <span class="text-slate-500 text-sm font-bold">Total Price</span>
+                        <span class="text-2xl font-black text-green-500">₦<span id="displayPrice">0.00</span></span>
+                    </div>
+                </div>
+
+                <button type="submit" id="buyBtn" class="w-full bg-green-600 hover:bg-green-500 text-white py-5 rounded-[2rem] font-black text-lg shadow-xl shadow-green-900/20 transition-all active:scale-95">
+                    Activate Sub
+                </button>
+            </form>
+        </section>
+
+        <!-- Receipt Section -->
+        <section id="receiptSection" class="hidden animate-in fade-in duration-500">
+            <div class="bg-slate-900 rounded-[3rem] border border-slate-800 p-8 text-center">
+                <div class="w-20 h-20 bg-green-500/10 text-green-500 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <i data-lucide="check-circle" class="w-10 h-10"></i>
+                </div>
+                <h2 class="text-2xl font-black text-white mb-2">Success!</h2>
+                <p class="text-slate-500 text-sm mb-8">Your subscription is being processed.</p>
+                
+                <div class="bg-slate-950 rounded-3xl p-6 text-left space-y-4 mb-8 border border-slate-800">
+                    <div class="flex justify-between text-sm"><span class="text-slate-500">Trans ID</span><span id="rId" class="text-white font-bold"></span></div>
+                    <div class="flex justify-between text-sm"><span class="text-slate-500">Provider</span><span id="rProv" class="text-white font-bold"></span></div>
+                    <div class="flex justify-between text-sm"><span class="text-slate-500">Plan</span><span id="rPlan" class="text-white font-bold"></span></div>
+                    <div class="flex justify-between text-sm"><span class="text-slate-500">IUC</span><span id="rIuc" class="text-white font-bold"></span></div>
+                    <div class="h-px bg-slate-800 my-2"></div>
+                    <div class="flex justify-between text-sm"><span class="text-slate-500">Amount</span><span id="rAmt" class="text-green-500 font-black"></span></div>
+                </div>
+
+                <button onclick="window.location.reload()" class="w-full py-5 rounded-[2rem] bg-green-600 text-white font-bold">Done</button>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby9Pjz8cEHubXV4W0ZTZVtlkMjC8dSV9PwAKqqUbHOdhIKvAtiCWCrQiPwCOZFHSDBSXA/exec';
+        let session = JSON.parse(localStorage.getItem('XMONIE'));
+        let allPlans = [];
+        let selectedProvider = '';
+
+        if (!session) window.location.href = 'login.html';
+        document.getElementById('balanceText').innerText = Number(session.user.balance).toLocaleString();
+        lucide.createIcons();
+
+        async function init() {
+            try {
+                const res = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'getTVPlans' }) });
+                const result = await res.json();
+                if (result.status === 'success') allPlans = result.data;
+            } catch (e) { alert("Error loading data"); }
+        }
+
+        function filterByProvider(prov, btn) {
+            selectedProvider = prov;
+            document.querySelectorAll('.nav-card').forEach(c => c.classList.remove('active'));
+            btn.classList.add('active');
+
+            const filtered = allPlans.filter(p => p.provider.toLowerCase() === prov.toLowerCase());
+            const select = document.getElementById('planSelect');
+            
+            select.innerHTML = '<option value="">Select a package...</option>' + 
+                filtered.map(p => `<option value="${p.id}" data-price="${p.price}" data-name="${p.planName}">${p.planName} - ₦${p.price.toLocaleString()}</option>`).join('');
+            
+            document.getElementById('tvForm').classList.remove('opacity-30', 'pointer-events-none');
+        }
+
+        function handlePlanChange() {
+            const select = document.getElementById('planSelect');
+            const price = select.options[select.selectedIndex].dataset.price || 0;
+            document.getElementById('displayPrice').innerText = Number(price).toLocaleString();
+        }
+
+        document.getElementById('tvForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const select = document.getElementById('planSelect');
+            const price = Number(select.options[select.selectedIndex].dataset.price);
+            const planName = select.options[select.selectedIndex].dataset.name;
+            const smartCard = document.getElementById('iucNumber').value;
+
+            if (price > session.user.balance) return alert("Insufficient Balance");
+
+            const btn = document.getElementById('buyBtn');
+            btn.disabled = true; btn.innerText = "Processing...";
+
+            try {
+                const res = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        action: 'purchaseTV',
+                        data: {
+                            userId: session.user.uid,
+                            provider: selectedProvider,
+                            planId: select.value,
+                            planName: planName,
+                            price: price,
+                            smartCard: smartCard
+                        }
+                    })
+                });
+                const result = await res.json();
+                if (result.status === 'success') {
+                    session.user.balance = result.newBalance;
+                    localStorage.setItem('XMONIE', JSON.stringify(session));
+                    showReceipt(result.receipt);
+                } else {
+                    alert(result.message);
+                    btn.disabled = false; btn.innerText = "Activate Sub";
+                }
+            } catch (err) { alert("Network Error"); btn.disabled = false; }
+        });
+
+        function showReceipt(r) {
+            document.getElementById('mainSection').classList.add('hidden');
+            document.getElementById('receiptSection').classList.remove('hidden');
+            document.getElementById('rId').innerText = r.id;
+            document.getElementById('rProv').innerText = r.provider;
+            document.getElementById('rPlan').innerText = r.plan;
+            document.getElementById('rIuc').innerText = r.smartCard;
+            document.getElementById('rAmt').innerText = `₦${r.amount.toLocaleString()}`;
+        }
+
+        init();
+    </script>
+</body>
+</html>

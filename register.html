@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up | XMONIE - Nigeria's No. 1 VTU Platform</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Create an account on XMONIE to access cheap data, instant airtime, and easy bill payments. Earn rewards for every friend you refer.">
+    <meta name="robots" content="index, follow">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .bg-mesh {
+            background-color: #020617;
+            background-image: radial-gradient(at 0% 0%, rgba(22, 163, 74, 0.1) 0px, transparent 50%),
+                              radial-gradient(at 100% 100%, rgba(22, 163, 74, 0.05) 0px, transparent 50%);
+        }
+    </style>
+</head>
+<body class="bg-mesh text-slate-100 min-h-screen flex flex-col">
+
+    <!-- Navbar -->
+    <nav class="p-6">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <a href="index.html" class="flex items-center gap-2 text-2xl font-black text-white">
+                <span class="bg-green-600 p-1.5 rounded-lg"><i data-lucide="coins" class="w-6 h-6"></i></span>
+                XMONIE
+            </a>
+            <a href="login.html" class="text-sm font-bold text-green-500 hover:text-green-400 transition">Login instead</a>
+        </div>
+    </nav>
+
+    <!-- Content -->
+    <main class="flex-grow flex items-center justify-center p-6">
+        <div class="w-full max-w-lg">
+            <div class="bg-slate-900/40 border border-slate-800 backdrop-blur-xl p-8 md:p-10 rounded-[2.5rem] shadow-2xl">
+                <div class="mb-8">
+                    <h1 class="text-3xl font-extrabold text-white mb-2">Get Started</h1>
+                    <p class="text-slate-400">Join the community of smart earners.</p>
+                </div>
+
+                <form id="signupForm" class="space-y-5">
+                    <!-- Name -->
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-widest text-slate-500 mb-2 ml-1">Full Name</label>
+                        <input type="text" name="name" required placeholder="Enter your full name" 
+                            class="w-full bg-slate-950 border border-slate-800 rounded-2xl px-5 py-4 focus:border-green-500 outline-none transition text-white">
+                    </div>
+
+                    <!-- Contact Group -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-widest text-slate-500 mb-2 ml-1">Email</label>
+                            <input type="email" name="email" required placeholder="Email address" 
+                                class="w-full bg-slate-950 border border-slate-800 rounded-2xl px-5 py-4 focus:border-green-500 outline-none transition">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-widest text-slate-500 mb-2 ml-1">Phone</label>
+                            <input type="tel" name="phone" required placeholder="080..." 
+                                class="w-full bg-slate-950 border border-slate-800 rounded-2xl px-5 py-4 focus:border-green-500 outline-none transition">
+                        </div>
+                    </div>
+
+                    <!-- Password -->
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-widest text-slate-500 mb-2 ml-1">Secure Password</label>
+                        <input type="password" name="password" required placeholder="Minimum 8 characters" 
+                            class="w-full bg-slate-950 border border-slate-800 rounded-2xl px-5 py-4 focus:border-green-500 outline-none transition">
+                    </div>
+
+                    <!-- Referral -->
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-widest text-slate-500 mb-2 ml-1">Referral Code (Optional)</label>
+                        <input type="text" name="referredBy" placeholder="e.g. SAM432" 
+                            class="w-full bg-slate-950 border border-slate-800 rounded-2xl px-5 py-4 focus:border-green-500 outline-none transition uppercase">
+                    </div>
+
+                    <!-- Submit -->
+                    <div class="pt-4">
+                        <button type="submit" id="btnText" class="w-full bg-green-600 hover:bg-green-500 text-white py-4 rounded-2xl font-bold text-lg transition-all transform hover:scale-[1.02] active:scale-95 shadow-lg shadow-green-900/20">
+                            Create Account
+                        </button>
+                    </div>
+                </form>
+            </div>
+            
+            <p class="text-center mt-10 text-slate-500 text-sm">
+                &copy; 2024 XMONIE Technologies. All rights reserved.
+            </p>
+        </div>
+    </main>
+
+    <!-- Success Feedback Overlay -->
+    <div id="overlay" class="fixed inset-0 bg-slate-950/95 flex flex-col items-center justify-center p-6 z-[100] hidden">
+        <div class="bg-green-600/10 p-4 rounded-full mb-6">
+            <i data-lucide="party-popper" class="w-16 h-16 text-green-500"></i>
+        </div>
+        <h2 class="text-3xl font-black text-white mb-2 text-center">Registration Success!</h2>
+        <p class="text-slate-400 mb-8 text-center max-w-xs">Your account is ready. Redirecting you to login...</p>
+        <a href="login.html" class="bg-green-600 px-10 py-4 rounded-2xl font-bold text-lg">Login Now</a>
+    </div>
+
+    <!-- Error Toast -->
+    <div id="errorToast" class="fixed top-10 left-1/2 -translate-x-1/2 bg-red-600 text-white px-6 py-3 rounded-full shadow-2xl opacity-0 transition-all duration-300 z-[110] pointer-events-none"></div>
+
+    <script>
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwMh5XKXr9g25xE-5ed2BL_9CIvOoy11F6RQHkfJtb-MuZIPui6ISgsezqtLcfaZgXy/exec'; // Paste your Deployed Apps Script URL here
+
+        lucide.createIcons();
+        const form = document.getElementById('signupForm');
+        const btnText = document.getElementById('btnText');
+        const overlay = document.getElementById('overlay');
+        const errorToast = document.getElementById('errorToast');
+
+        function showError(msg) {
+            errorToast.innerText = msg;
+            errorToast.classList.remove('opacity-0');
+            errorToast.classList.add('opacity-100');
+            setTimeout(() => {
+                errorToast.classList.remove('opacity-100');
+                errorToast.classList.add('opacity-0');
+            }, 4000);
+        }
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            if (!SCRIPT_URL) {
+                showError("Error: API URL is missing. Check the script.");
+                return;
+            }
+
+            // UI State
+            btnText.disabled = true;
+            btnText.innerText = "Setting up account...";
+
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData);
+
+            try {
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'signup', data: data })
+                });
+
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    overlay.classList.remove('hidden');
+                    // Optional: Redirect after 3 seconds
+                    setTimeout(() => window.location.href = 'login.html', 3000);
+                } else {
+                    showError(result.message || "An error occurred.");
+                    btnText.disabled = false;
+                    btnText.innerText = "Create Account";
+                }
+            } catch (err) {
+                showError("Network Error. Please try again later.");
+                btnText.disabled = false;
+                btnText.innerText = "Create Account";
+            }
+        });
+    </script>
+</body>
+</html>

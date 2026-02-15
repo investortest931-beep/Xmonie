@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buy Airtime | XMONIE</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #020617; }
+        .network-card.selected { border-color: #22c55e; background: rgba(34, 197, 94, 0.1); transform: scale(1.02); }
+        .custom-loader { border-right-color: transparent; animation: spin 0.8s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="text-slate-100 min-h-screen">
+
+    <!-- Header -->
+    <header class="p-6 flex items-center justify-between border-b border-slate-800 bg-slate-950/50 sticky top-0 z-40 backdrop-blur-md">
+        <div class="flex items-center gap-4">
+            <a href="dashboard.html" class="p-2 bg-slate-900 rounded-xl hover:bg-slate-800 transition">
+                <i data-lucide="arrow-left" class="w-5 h-5 text-slate-400"></i>
+            </a>
+            <h1 class="text-xl font-bold">Airtime VTU</h1>
+        </div>
+        <div class="bg-green-600/10 px-4 py-1.5 rounded-full border border-green-600/20">
+            <span class="text-green-500 text-xs font-bold">Balance: ₦<span id="topBalance">0.00</span></span>
+        </div>
+    </header>
+
+    <main class="p-6 max-w-xl mx-auto pb-32">
+        
+        <section id="formSection">
+            <!-- Network Selection -->
+            <div class="mb-8">
+                <h3 class="text-sm font-bold uppercase tracking-widest text-slate-500 mb-4 flex items-center gap-2">
+                    <i data-lucide="signal" class="w-4 h-4"></i> Choose Network
+                </h3>
+                <div id="networkGrid" class="grid grid-cols-2 gap-4">
+                    <!-- Shimmer Loaders -->
+                    <div class="bg-slate-900 h-28 rounded-3xl animate-pulse"></div>
+                    <div class="bg-slate-900 h-28 rounded-3xl animate-pulse"></div>
+                </div>
+            </div>
+
+            <!-- Input Form -->
+            <form id="purchaseForm" class="space-y-6 opacity-40 pointer-events-none transition-opacity duration-300">
+                <div class="bg-slate-900 border border-slate-800 rounded-[2rem] p-6 space-y-6">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-3 ml-1">Phone Number</label>
+                        <div class="relative">
+                            <i data-lucide="phone" class="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500"></i>
+                            <input type="tel" id="phoneNumber" required placeholder="080 1234 5678" maxlength="11"
+                                class="w-full bg-slate-950 border border-slate-800 rounded-2xl pl-14 pr-5 py-4 focus:border-green-500 outline-none text-white transition-all">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-3 ml-1">Amount to Purchase</label>
+                        <div class="relative">
+                            <span class="absolute left-5 top-1/2 -translate-y-1/2 font-bold text-slate-400">₦</span>
+                            <input type="number" id="amount" required placeholder="0.00" 
+                                class="w-full bg-slate-950 border border-slate-800 rounded-2xl pl-12 pr-5 py-4 focus:border-green-500 outline-none text-white font-bold transition-all">
+                        </div>
+                        <p id="minAmtHint" class="mt-2 text-[10px] text-slate-500 ml-1"></p>
+                    </div>
+                </div>
+
+                <button type="submit" id="buyBtn" class="w-full bg-green-600 hover:bg-green-500 text-white py-5 rounded-[2rem] font-bold text-lg shadow-xl shadow-green-900/20 transition-all active:scale-95 flex items-center justify-center gap-3">
+                    <i data-lucide="shopping-cart" class="w-5 h-5"></i> Confirm Purchase
+                </button>
+            </form>
+        </section>
+
+        <!-- Receipt Section -->
+        <section id="receiptSection" class="hidden animate-in fade-in zoom-in duration-300">
+            <div class="bg-slate-900 rounded-[3rem] border border-slate-800 p-8 text-center relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-full h-2 bg-green-600"></div>
+                
+                <div class="w-24 h-24 bg-green-500/10 text-green-500 rounded-full flex items-center justify-center mx-auto mb-6 mt-4">
+                    <i data-lucide="check" class="w-12 h-12 stroke-[3]"></i>
+                </div>
+                
+                <h2 class="text-2xl font-black mb-1">Transaction Success</h2>
+                <p class="text-slate-500 text-sm mb-8 font-medium">Your request has been processed.</p>
+                
+                <div class="bg-slate-950 rounded-[2rem] p-6 space-y-4 text-left border border-slate-800">
+                    <div class="flex justify-between items-center text-sm">
+                        <span class="text-slate-500">Ref ID</span>
+                        <span id="recId" class="font-mono font-bold text-slate-300">---</span>
+                    </div>
+                    <div class="flex justify-between items-center text-sm">
+                        <span class="text-slate-500">Service</span>
+                        <span id="recNet" class="font-bold text-white">---</span>
+                    </div>
+                    <div class="flex justify-between items-center text-sm">
+                        <span class="text-slate-500">Recipient</span>
+                        <span id="recPhone" class="font-bold text-white">---</span>
+                    </div>
+                    <div class="h-px bg-slate-800 w-full my-2"></div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-slate-400 font-bold">Total Paid</span>
+                        <span id="recAmount" class="font-black text-2xl text-green-500">₦0.00</span>
+                    </div>
+                </div>
+
+                <div class="mt-10 space-y-3">
+                    <button onclick="window.location.reload()" class="w-full py-4 rounded-2xl bg-slate-800 text-white font-bold hover:bg-slate-700 transition">
+                        Buy Another
+                    </button>
+                    <button onclick="window.location.href='dashboard.html'" class="w-full py-4 text-slate-500 font-bold hover:text-white transition">
+                        Return to Home
+                    </button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxhfXpIRYfeXNEon25hLVc_y9YLveTGwljztONyO1t4My9dCJ06ULt0EZK4UXrLdoBq/exec';
+        let session = JSON.parse(localStorage.getItem('XMONIE'));
+        let selectedNetwork = null;
+
+        if (!session) window.location.href = 'login.html';
+
+        lucide.createIcons();
+        document.getElementById('topBalance').innerText = Number(session.user.balance).toLocaleString();
+
+        async function loadNetworks() {
+            try {
+                const res = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'getAirtimeTypes' })
+                });
+                const result = await res.json();
+                if (result.status === 'success') {
+                    renderNetworks(result.data);
+                }
+            } catch (e) {
+                console.error("Network Fetch Error:", e);
+            }
+        }
+
+        function renderNetworks(networks) {
+            const grid = document.getElementById('networkGrid');
+            grid.innerHTML = networks.map(n => `
+                <div onclick="selectNetwork('${n.network}', ${n.minAmt}, this)" 
+                     class="network-card bg-slate-900 border border-slate-800 rounded-[2rem] p-5 flex flex-col items-center justify-center cursor-pointer transition-all hover:border-slate-700 shadow-lg">
+                    <div class="w-14 h-14 bg-white rounded-2xl p-2 mb-3 shadow-inner">
+                        <img src="${n.icon}" class="w-full h-full object-contain">
+                    </div>
+                    <span class="font-bold text-sm text-white">${n.network}</span>
+                    <span class="text-[10px] text-slate-500 font-bold mt-1">MIN ₦${n.minAmt}</span>
+                </div>
+            `).join('');
+        }
+
+        function selectNetwork(net, min, el) {
+            selectedNetwork = net;
+            document.querySelectorAll('.network-card').forEach(c => c.classList.remove('selected'));
+            el.classList.add('selected');
+            
+            const form = document.getElementById('purchaseForm');
+            form.classList.remove('opacity-40', 'pointer-events-none');
+            
+            document.getElementById('amount').min = min;
+            document.getElementById('minAmtHint').innerText = `Minimum purchase for ${net} is ₦${min}`;
+            
+            // Soft scroll to form
+            form.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.getElementById('purchaseForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const amount = Number(document.getElementById('amount').value);
+            const phone = document.getElementById('phoneNumber').value;
+
+            if (amount > session.user.balance) {
+                showToast("Insufficient Wallet Balance!");
+                return;
+            }
+
+            const buyBtn = document.getElementById('buyBtn');
+            buyBtn.disabled = true;
+            buyBtn.innerHTML = `<div class="w-5 h-5 border-2 border-white custom-loader rounded-full"></div> Processing Order...`;
+
+            try {
+                const res = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        action: 'purchaseAirtime',
+                        data: {
+                            userId: session.user.uid,
+                            network: selectedNetwork,
+                            amount: amount,
+                            phone: phone
+                        }
+                    })
+                });
+                const result = await res.json();
+
+                if (result.status === 'success') {
+                    session.user.balance = result.newBalance;
+                    localStorage.setItem('XMONIE', JSON.stringify(session));
+                    showReceipt(result.receipt);
+                } else {
+                    showToast(result.message);
+                    resetBtn();
+                }
+            } catch (err) {
+                showToast("Server error. Please check your internet.");
+                resetBtn();
+            }
+        });
+
+        function resetBtn() {
+            const buyBtn = document.getElementById('buyBtn');
+            buyBtn.disabled = false;
+            buyBtn.innerHTML = `<i data-lucide="shopping-cart" class="w-5 h-5"></i> Confirm Purchase`;
+            lucide.createIcons();
+        }
+
+        function showReceipt(data) {
+            document.getElementById('formSection').classList.add('hidden');
+            document.getElementById('receiptSection').classList.remove('hidden');
+            document.getElementById('recId').innerText = data.id;
+            document.getElementById('recNet').innerText = data.network + ' Airtime';
+            document.getElementById('recPhone').innerText = data.phone;
+            document.getElementById('recAmount').innerText = `₦${Number(data.amount).toLocaleString()}`;
+            lucide.createIcons();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function showToast(msg) {
+            // Simple overlay toast
+            const toast = document.createElement('div');
+            toast.className = "fixed top-10 left-1/2 -translate-x-1/2 bg-red-600 text-white px-6 py-3 rounded-full font-bold shadow-2xl z-[100] animate-bounce";
+            toast.innerText = msg;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        loadNetworks();
+    </script>
+</body>
+</html>

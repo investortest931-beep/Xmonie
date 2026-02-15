@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | XMONIE</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .sidebar-link.active { @apply bg-green-600/10 text-green-500 border-r-4 border-green-600; }
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 10px; }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen">
+
+    <!-- Mobile Header -->
+    <div class="lg:hidden flex items-center justify-between p-4 bg-slate-900 border-b border-slate-800 fixed top-0 w-full z-50">
+        <div class="flex items-center gap-2 font-bold text-xl">
+            <i data-lucide="coins" class="text-green-500"></i> XMONIE
+        </div>
+        <button onclick="toggleSidebar()" class="p-2 bg-slate-800 rounded-lg">
+            <i data-lucide="menu"></i>
+        </button>
+    </div>
+
+    <div class="flex">
+        <!-- Sidebar -->
+        <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-64 bg-slate-900 border-r border-slate-800 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 lg:static lg:h-screen">
+            <div class="p-6">
+                <div class="flex items-center gap-2 text-2xl font-black text-white mb-10">
+                    <span class="bg-green-600 p-1.5 rounded-lg"><i data-lucide="coins" class="w-6 h-6"></i></span>
+                    XMONIE
+                </div>
+
+                <nav class="space-y-1">
+                    <a href="dashboard.html" class="sidebar-link active flex items-center gap-3 px-4 py-3 rounded-xl transition font-semibold">
+                        <i data-lucide="layout-grid" class="w-5 h-5"></i> Dashboard
+                    </a>
+                    <a href="#" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl transition font-semibold text-slate-400 hover:text-white hover:bg-slate-800">
+                        <i data-lucide="wallet" class="w-5 h-5"></i> Wallet
+                    </a>
+                    <a href="#" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl transition font-semibold text-slate-400 hover:text-white hover:bg-slate-800">
+                        <i data-lucide="history" class="w-5 h-5"></i> Transactions
+                    </a>
+                    <a href="#" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl transition font-semibold text-slate-400 hover:text-white hover:bg-slate-800">
+                        <i data-lucide="users" class="w-5 h-5"></i> Referrals
+                    </a>
+                    <div class="pt-10">
+                        <p class="text-[10px] uppercase tracking-widest text-slate-500 font-bold mb-4 px-4">Account</p>
+                        <a href="#" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl transition font-semibold text-slate-400 hover:text-white hover:bg-slate-800">
+                            <i data-lucide="settings" class="w-5 h-5"></i> Settings
+                        </a>
+                        <button onclick="logout()" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition font-semibold text-red-400 hover:bg-red-500/10">
+                            <i data-lucide="log-out" class="w-5 h-5"></i> Logout
+                        </button>
+                    </div>
+                </nav>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 h-screen overflow-y-auto custom-scrollbar p-6 lg:p-10 pt-24 lg:pt-10">
+            <!-- Header -->
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10">
+                <div>
+                    <h1 class="text-2xl font-bold text-white">Hello, <span id="userName">User</span> 👋</h1>
+                    <p class="text-slate-500 text-sm">Welcome back to your XMONIE portal.</p>
+                </div>
+                <div class="flex items-center gap-3">
+                    <button class="p-3 bg-slate-900 border border-slate-800 rounded-2xl relative">
+                        <i data-lucide="bell" class="w-5 h-5"></i>
+                        <span class="absolute top-3 right-3 w-2 h-2 bg-green-500 rounded-full"></span>
+                    </button>
+                    <div class="w-12 h-12 bg-green-600 rounded-2xl flex items-center justify-center font-bold text-white">
+                        XM
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cards -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-10">
+                <div class="lg:col-span-2 bg-green-600 rounded-[2rem] p-8 relative overflow-hidden shadow-2xl shadow-green-900/20">
+                    <div class="relative z-10">
+                        <p class="text-green-100 font-semibold mb-1 opacity-80">Wallet Balance</p>
+                        <h2 class="text-4xl font-black mb-8">₦<span id="userBalance">0.00</span></h2>
+                        <div class="flex gap-3">
+                           <a href="deposit.html" <button class="bg-white text-green-700 px-6 py-3 rounded-xl font-bold text-sm flex items-center gap-2 hover:scale-105 transition">
+                                <i data-lucide="plus" class="w-4 h-4"></i> Add Money
+                            </button></a>
+                           <a href="withdraw.html" <button class="bg-green-700/50 text-white border border-green-500/30 px-6 py-3 rounded-xl font-bold text-sm flex items-center gap-2 hover:scale-105 transition">
+                                <i data-lucide="arrow-up-right" class="w-4 h-4"></i> Withdraw
+                            </button></a>
+                        </div>
+                    </div>
+                    <i data-lucide="wallet" class="absolute -right-10 -bottom-10 w-48 h-48 text-white/10 -rotate-12"></i>
+                </div>
+
+                
+            <!-- Products Grid -->
+            <h3 class="text-lg font-bold mb-6">Quick Actions</h3>
+            <div id="productGrid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-10">
+                <!-- Fallback skeletons if no products in sheet -->
+                <a href="#" class="p-6 bg-slate-900 border border-slate-800 rounded-3xl text-center hover:border-green-500 transition group">
+                    <div class="w-12 h-12 bg-blue-500/10 text-blue-500 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition">
+                        <i data-lucide="phone"></i>
+                    </div>
+                    <p class="text-sm font-bold">Airtime</p>
+                </a>
+                <!-- More will be injected here -->
+            </div><div class="bg-slate-900 border border-slate-800 rounded-[2rem] p-8">
+                    <p class="text-slate-400 font-semibold mb-4">Refer & Earn</p>
+                    <div class="bg-slate-950 border border-slate-800 p-4 rounded-2xl flex items-center justify-between mb-4">
+                        <span id="refCode" class="font-mono font-bold tracking-widest text-green-500 uppercase">LOADING...</span>
+                        <button onclick="copyRef()" class="p-2 hover:bg-slate-800 rounded-lg text-slate-500 transition">
+                            <i data-lucide="copy" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                    <p class="text-xs text-slate-500 leading-relaxed">Share your code and get <span class="text-white font-bold">₦100</span> instantly when your friends sign up.</p>
+                </div>
+            </div>
+
+
+            <!-- Transactions Table -->
+            <div class="bg-slate-900 border border-slate-800 rounded-[2rem] overflow-hidden">
+                <div class="p-6 border-b border-slate-800 flex justify-between items-center">
+                    <h3 class="font-bold">Recent Transactions</h3>
+                    <a href="#" class="text-xs font-bold text-green-500">View All</a>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left">
+                        <thead class="text-xs uppercase text-slate-500 bg-slate-950/50">
+                            <tr>
+                                <th class="px-6 py-4">Transaction</th>
+                                <th class="px-6 py-4">Amount</th>
+                                <th class="px-6 py-4">Status</th>
+                                <th class="px-6 py-4">Date</th>
+                            </tr>
+                        </thead>
+                        <tbody id="transTable" class="text-sm">
+                            <tr><td colspan="4" class="px-6 py-10 text-center text-slate-500">Loading history...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+    <!-- 
+  XMONIE MOBILE BOTTOM APP BAR
+  Pages: Home, Deposit, Profile, Referral 
+-->
+
+<div class="lg:hidden fixed bottom-0 left-0 right-0 z-[100] bg-slate-900/80 backdrop-blur-2xl border-t border-slate-800 pb-safe">
+    <nav class="flex items-center justify-around h-20 px-2">
+        
+        <!-- Home -->
+        <a href="dashboard.html" id="nav-home" class="flex flex-col items-center justify-center w-full gap-1 transition-all duration-300 text-slate-400">
+            <div class="p-1.5 transition-colors duration-300 rounded-xl">
+                <i data-lucide="home" class="w-6 h-6"></i>
+            </div>
+            <span class="text-[10px] font-bold uppercase tracking-wider">Home</span>
+        </a>
+
+        <!-- Wallet (Deposit) -->
+        <a href="deposit.html" id="nav-deposit" class="flex flex-col items-center justify-center w-full gap-1 transition-all duration-300 text-slate-400">
+            <div class="p-1.5 transition-colors duration-300 rounded-xl">
+                <i data-lucide="plus-circle" class="w-6 h-6"></i>
+            </div>
+            <span class="text-[10px] font-bold uppercase tracking-wider">Deposit</span>
+        </a>
+
+        <!-- Referral -->
+        <a href="referral.html" id="nav-referral" class="flex flex-col items-center justify-center w-full gap-1 transition-all duration-300 text-slate-400">
+            <div class="p-1.5 transition-colors duration-300 rounded-xl">
+                <i data-lucide="gift" class="w-6 h-6"></i>
+            </div>
+            <span class="text-[10px] font-bold uppercase tracking-wider">Referral</span>
+        </a>
+
+        <!-- Profile -->
+        <a href="profile.html" id="nav-profile" class="flex flex-col items-center justify-center w-full gap-1 transition-all duration-300 text-slate-400">
+            <div class="p-1.5 transition-colors duration-300 rounded-xl">
+                <i data-lucide="user" class="w-6 h-6"></i>
+            </div>
+            <span class="text-[10px] font-bold uppercase tracking-wider">Profile</span>
+        </a>
+
+    </nav>
+</div>
+
+<style>
+    /* Adjust main layout to prevent overlap on mobile */
+    @media (max-width: 1024px) {
+        body {
+            padding-bottom: 90px !important;
+        }
+    }
+    
+    /* Active Style */
+    .nav-active {
+        color: #22c55e !important; /* text-green-500 */
+    }
+    .nav-active div {
+        background-color: rgba(34, 197, 94, 0.15);
+    }
+</style>
+
+<script>
+    /**
+     * Logic to automatically highlight the active link
+     */
+    (function() {
+        function setActiveNav() {
+            const currentPath = window.location.pathname.split("/").pop() || "dashboard.html";
+            const navMap = {
+                'dashboard.html': 'nav-home',
+                'deposit.html': 'nav-deposit',
+                'referral.html': 'nav-referral',
+                'profile.html': 'nav-profile'
+            };
+
+            const activeId = navMap[currentPath];
+            if (activeId) {
+                const activeEl = document.getElementById(activeId);
+                if (activeEl) {
+                    activeEl.classList.add('nav-active');
+                }
+            }
+        }
+
+        // Initialize on load
+        window.addEventListener('DOMContentLoaded', () => {
+            setActiveNav();
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+        });
+    })();
+</script>
+
+    <script>
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyIwUZcXwSvgCGhDfu6UL9XV2IAbLcoyMnhNZjGAhsuoYr6apitcPF_c-v86ItZDNM7/exec'; // Paste your Apps Script Web App URL here
+        let session = JSON.parse(localStorage.getItem('XMONIE'));
+
+        // Guard: Check if logged in
+        if (!session || !session.user) {
+            window.location.href = 'login.html';
+        }
+
+        lucide.createIcons();
+        document.getElementById('userName').innerText = session.user.name.split(' ')[0];
+        document.getElementById('userBalance').innerText = Number(session.user.balance).toLocaleString();
+        document.getElementById('refCode').innerText = session.user.referralCode;
+
+        async function fetchDashboard() {
+            if (!SCRIPT_URL) return;
+            try {
+                const res = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ 
+                        action: 'getDashboardData', 
+                        userId: session.user.uid 
+                    })
+                });
+                const data = await res.json();
+                if (data.status === 'success') {
+                    // Update Balance
+                    document.getElementById('userBalance').innerText = Number(data.balance).toLocaleString();
+                    
+                    // Render Products
+                    renderProducts(data.products);
+                    
+                    // Render Transactions
+                    renderTransactions(data.transactions);
+                }
+            } catch (err) {
+                console.error("Dashboard sync failed", err);
+            }
+        }
+
+        function renderProducts(products) {
+            const grid = document.getElementById('productGrid');
+            if (products.length === 0) return;
+            grid.innerHTML = products.map(p => `
+                <a href="${p.link}" class="p-6 bg-slate-900 border border-slate-800 rounded-3xl text-center hover:border-green-500 transition group">
+                    <div class="w-12 h-12 bg-green-500/10 text-green-500 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition">
+                        <img src="${p.icon}" class="w-6 h-6 object-contain" onerror="this.src='https://img.icons8.com/ios-filled/50/22C55E/services.png'">
+                    </div>
+                    <p class="text-sm font-bold">${p.name}</p>
+                </a>
+            `).join('');
+        }
+
+        function renderTransactions(transactions) {
+            const table = document.getElementById('transTable');
+            if (transactions.length === 0) {
+                table.innerHTML = `<tr><td colspan="4" class="px-6 py-10 text-center text-slate-500">No transactions yet.</td></tr>`;
+                return;
+            }
+            table.innerHTML = transactions.map(t => `
+                <tr class="border-b border-slate-800/50 hover:bg-slate-800/20 transition">
+                    <td class="px-6 py-4">
+                        <div class="font-bold">${t.product}</div>
+                        <div class="text-[10px] text-slate-500">${t.id}</div>
+                    </td>
+                    <td class="px-6 py-4 font-bold">₦${Number(t.amount).toLocaleString()}</td>
+                    <td class="px-6 py-4">
+                        <span class="px-2 py-1 rounded-md text-[10px] font-bold ${t.status === 'completed' ? 'bg-green-500/10 text-green-500' : 'bg-yellow-500/10 text-yellow-500'}">
+                            ${t.status.toUpperCase()}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 text-xs text-slate-500">${new Date(t.date).toLocaleDateString()}</td>
+                </tr>
+            `).join('');
+        }
+
+        function logout() {
+            localStorage.removeItem('XMONIE');
+            window.location.href = 'index.html';
+        }
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('-translate-x-full');
+        }
+
+        function copyRef() {
+            const code = document.getElementById('refCode').innerText;
+            const el = document.createElement('textarea');
+            el.value = code;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+            alert("Referral code copied!");
+        }
+
+        fetchDashboard();
+    </script>
+</body>
+</html>
