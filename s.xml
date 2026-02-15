@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"> 
+<url>
+  <loc>http://xmoniepay.vercel.app/</loc>
+  <priority>0.1</priority>
+  <changefreq>always</changefreq>
+</url>
+<url>
+  <loc>http://xmoniepay.vercel.app/login.html</loc>
+  <priority>0.1</priority>
+  <changefreq>always</changefreq>
+</url>
+<url>
+  <loc>http://xmoniepay.vercel.app/register.html</loc>
+  <priority>0.1</priority>
+  <changefreq>always</changefreq>
+</url>
+<url>
+  <loc>http://xmoniepay.vercel.app/index.html</loc>
+  <priority>0.1</priority>
+  <changefreq>always</changefreq>
+</url>
+</urlset>
