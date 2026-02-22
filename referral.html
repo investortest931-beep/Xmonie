@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Refer & Earn | XMONIE</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #020617; }
+        .glass-panel { background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(51, 65, 85, 0.5); }
+        .refer-gradient { background: linear-gradient(135deg, #16a34a 0%, #065f46 100%); }
+    </style>
+</head>
+<body class="text-slate-100 min-h-screen">
+
+    <header class="p-6 flex items-center gap-4 border-b border-slate-800 bg-slate-950/50 sticky top-0 z-40 backdrop-blur-md">
+        <a href="dashboard.html" class="p-2 bg-slate-900 rounded-xl text-slate-400">
+            <i data-lucide="arrow-left" class="w-5 h-5"></i>
+        </a>
+        <h1 class="text-xl font-bold">Referrals</h1>
+    </header>
+
+    <main class="p-6 max-w-xl mx-auto pb-32">
+        
+        <!-- Summary Dashboard -->
+        <div class="refer-gradient rounded-[2.5rem] p-8 mb-8 text-white relative overflow-hidden shadow-2xl shadow-green-900/20">
+            <div class="relative z-10">
+                <p class="text-green-100 text-[10px] font-black uppercase tracking-[0.2em] mb-2 opacity-80">Total Bonus Earned</p>
+                <h2 class="text-5xl font-black mb-8">₦<span id="totalEarnings">0.00</span></h2>
+                
+                <div class="grid grid-cols-2 gap-4 pt-6 border-t border-white/20">
+                    <div>
+                        <p class="text-green-100 text-[10px] font-bold uppercase opacity-70">Referred Users</p>
+                        <p class="text-2xl font-black" id="totalCount">0</p>
+                    </div>
+                    <div>
+                        <p class="text-green-100 text-[10px] font-bold uppercase opacity-70">Reward Rate</p>
+                        <p class="text-2xl font-black">₦100</p>
+                    </div>
+                </div>
+            </div>
+            <i data-lucide="gift" class="absolute -right-6 -bottom-6 w-48 h-48 text-white/10 -rotate-12"></i>
+        </div>
+
+        <!-- Referral Link Section -->
+        <section class="glass-panel rounded-[2rem] p-6 mb-8">
+            <h3 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4 flex items-center gap-2">
+                <i data-lucide="share-2" class="w-4 h-4 text-green-500"></i> Your Referral Link
+            </h3>
+            <div class="flex items-center gap-2 bg-slate-950 rounded-2xl p-2 border border-slate-800">
+                <input type="text" id="refLink" readonly class="bg-transparent border-none text-xs text-slate-300 flex-1 px-3 outline-none" value="Loading...">
+                <button onclick="copyRefLink()" class="bg-green-600 hover:bg-green-500 text-white px-5 py-3 rounded-xl text-xs font-bold flex items-center gap-2 transition-all active:scale-95">
+                    <i data-lucide="copy" class="w-4 h-4"></i> Copy
+                </button>
+            </div>
+            <p class="text-[11px] text-slate-500 mt-4 leading-relaxed italic">
+                Earn ₦100 every time a friend signs up using your code and funds their wallet for the first time.
+            </p>
+        </section>
+
+        <!-- Referral History -->
+        <section>
+            <div class="flex items-center justify-between mb-4 px-2">
+                <h3 class="text-xs font-bold text-slate-500 uppercase tracking-widest">Recent Activity</h3>
+                <span class="text-[10px] bg-slate-800 px-3 py-1 rounded-full text-slate-400 font-bold" id="activityBadge">0 Users</span>
+            </div>
+            
+            <div id="referralList" class="space-y-3">
+                <!-- Skeleton Loader -->
+                <div class="animate-pulse space-y-3">
+                    <div class="h-20 bg-slate-900/50 rounded-2xl border border-slate-800"></div>
+                    <div class="h-20 bg-slate-900/50 rounded-2xl border border-slate-800"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // REPLACE THIS WITH YOUR DEPLOYED WEB APP URL
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxSI-aebqs3lRmu0Z0xrYtPbuw1ZGRHo9OwjMghbCinqPl8_oGnGRZAUgyys-BgJfDT/exec';
+        const session = JSON.parse(localStorage.getItem('XMONIE'));
+        if (!session) window.location.href = 'login.html';
+
+        lucide.createIcons();
+
+        // 1. Generate Referral Link
+        const referralCode = session.user.referralCode || 'XMONIE';
+        const signupUrl = `${window.location.origin}/register.html?ref=${referralCode}`;
+        document.getElementById('refLink').value = signupUrl;
+
+        async function fetchReferrals() {
+            try {
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        action: 'getReferralData',
+                        userId: session.user.uid
+                    })
+                });
+
+                const result = await response.json();
+                if (result.status === 'success') {
+                    renderUI(result);
+                } else {
+                    console.error(result.message);
+                }
+            } catch (err) {
+                console.error("Connection failed");
+            }
+        }
+
+        function renderUI(data) {
+            document.getElementById('totalEarnings').innerText = Number(data.stats.totalEarnings).toLocaleString();
+            document.getElementById('totalCount').innerText = data.stats.totalCount;
+            document.getElementById('activityBadge').innerText = `${data.stats.totalCount} Users`;
+
+            const listEl = document.getElementById('referralList');
+            if (data.list.length === 0) {
+                listEl.innerHTML = `
+                    <div class="text-center py-12 glass-panel rounded-3xl">
+                        <i data-lucide="users" class="w-12 h-12 mx-auto text-slate-700 mb-4"></i>
+                        <p class="text-slate-500 text-sm font-bold">No referrals yet.</p>
+                        <p class="text-slate-600 text-xs mt-1">Share your link to start earning!</p>
+                    </div>
+                `;
+            } else {
+                listEl.innerHTML = data.list.map(user => `
+                    <div class="bg-slate-900/40 border border-slate-800 p-5 rounded-2xl flex items-center justify-between">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 bg-green-600/10 text-green-500 rounded-full flex items-center justify-center font-bold text-lg">
+                                ${user.name.charAt(0).toUpperCase()}
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-bold text-white">${user.name}</h4>
+                                <p class="text-[10px] text-slate-500 mt-1">${new Date(user.date).toLocaleDateString()}</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-xs font-black text-green-500">+₦${user.reward}</p>
+                            <span class="text-[9px] text-slate-500 uppercase font-bold">Bonus</span>
+                        </div>
+                    </div>
+                `).reverse().join('');
+            }
+            lucide.createIcons();
+        }
+
+        function copyRefLink() {
+            const copyText = document.getElementById("refLink");
+            copyText.select();
+            copyText.setSelectionRange(0, 99999);
+            document.execCommand("copy");
+            
+            const btn = event.currentTarget;
+            const originalHtml = btn.innerHTML;
+            btn.innerHTML = `<i data-lucide="check" class="w-4 h-4"></i> Copied`;
+            lucide.createIcons();
+            setTimeout(() => {
+                btn.innerHTML = originalHtml;
+                lucide.createIcons();
+            }, 2000);
+        }
+
+        // Initialize
+        fetchReferrals();
+    </script>
+</body>
+</html>
