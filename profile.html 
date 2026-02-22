@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile | XMONIE</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #020617; }
+        .profile-gradient { background: linear-gradient(180deg, #16a34a 0%, #020617 100%); }
+        .glass-card { background: rgba(30, 41, 59, 0.4); backdrop-filter: blur(12px); border: 1px solid rgba(51, 65, 85, 0.5); }
+    </style>
+</head>
+<body class="text-slate-100 min-h-screen pb-20">
+
+    <!-- Top Profile Section -->
+    <div class="profile-gradient pt-12 pb-8 px-6 text-center">
+        <div class="flex justify-between items-center mb-8">
+            <a href="dashboard.html" class="p-2 bg-white/10 rounded-xl backdrop-blur-md">
+                <i data-lucide="arrow-left" class="w-5 h-5"></i>
+            </a>
+            <h1 class="font-bold">Profile Settings</h1>
+            <button onclick="logout()" class="p-2 bg-red-500/10 text-red-500 rounded-xl backdrop-blur-md">
+                <i data-lucide="log-out" class="w-5 h-5"></i>
+            </button>
+        </div>
+
+        <div class="relative inline-block mb-4">
+            <div class="w-24 h-24 bg-slate-900 rounded-full border-4 border-slate-950 flex items-center justify-center text-3xl font-black text-green-500 shadow-2xl mx-auto">
+                <span id="initials">...</span>
+            </div>
+            <div class="absolute bottom-0 right-0 w-8 h-8 bg-green-600 rounded-full border-4 border-slate-950 flex items-center justify-center">
+                <i data-lucide="camera" class="w-3 h-3 text-white"></i>
+            </div>
+        </div>
+        
+        <h2 id="userName" class="text-2xl font-black">Loading...</h2>
+        <p id="userEmail" class="text-slate-400 text-sm">Please wait...</p>
+    </div>
+
+    <main class="px-6 -mt-4">
+        <!-- Stats Row -->
+        <div class="grid grid-cols-2 gap-4 mb-8">
+            <div class="glass-card p-5 rounded-[2rem] text-center">
+                <p class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">Total Funded</p>
+                <p class="text-lg font-black text-green-500">₦<span id="statFunded">0</span></p>
+            </div>
+            <div class="glass-card p-5 rounded-[2rem] text-center">
+                <p class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">Total Orders</p>
+                <p class="text-lg font-black text-white" id="statOrders">0</p>
+            </div>
+        </div>
+
+        <!-- Account Info -->
+        <section class="space-y-4">
+            <h3 class="text-xs font-black uppercase tracking-widest text-slate-500 ml-2">Personal Information</h3>
+            
+            <div class="glass-card rounded-[2rem] overflow-hidden">
+                <div class="p-5 flex items-center gap-4 border-b border-slate-800">
+                    <div class="w-10 h-10 bg-slate-800 rounded-xl flex items-center justify-center text-slate-400">
+                        <i data-lucide="phone" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <p class="text-[10px] font-bold text-slate-500 uppercase">Phone Number</p>
+                        <p id="userPhone" class="font-bold text-sm">---</p>
+                    </div>
+                </div>
+
+                <div class="p-5 flex items-center gap-4 border-b border-slate-800">
+                    <div class="w-10 h-10 bg-slate-800 rounded-xl flex items-center justify-center text-slate-400">
+                        <i data-lucide="hash" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <p class="text-[10px] font-bold text-slate-500 uppercase">Referral Code</p>
+                        <p id="userRef" class="font-bold text-sm text-green-500">---</p>
+                    </div>
+                </div>
+
+                <div class="p-5 flex items-center gap-4">
+                    <div class="w-10 h-10 bg-slate-800 rounded-xl flex items-center justify-center text-slate-400">
+                        <i data-lucide="calendar" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <p class="text-[10px] font-bold text-slate-500 uppercase">Member Since</p>
+                        <p id="userJoined" class="font-bold text-sm">---</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Danger Zone -->
+        <section class="mt-12">
+            <button onclick="logout()" class="w-full bg-slate-900 border border-slate-800 text-red-500 py-5 rounded-[2rem] font-black flex items-center justify-center gap-3 active:scale-95 transition-all">
+                <i data-lucide="log-out" class="w-5 h-5"></i>
+                Sign Out of Account
+            </button>
+            <p class="text-center text-[10px] text-slate-600 mt-6 font-bold uppercase tracking-widest">XMONIE VERSION 2.1.0</p>
+        </section>
+    </main>
+    <script>
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyhSq8F8XQ7PpPWB6S9wgQumiEAtpLHB3GHW0v-hEa0q4fGm7HRAj8TPqmKu2uqyO_i/exec';
+        let session = JSON.parse(localStorage.getItem('XMONIE'));
+
+        if (!session) window.location.href = 'login.html';
+        lucide.createIcons();
+
+        async function loadProfile() {
+            try {
+                const res = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        action: 'getProfileData',
+                        userId: session.user.uid
+                    })
+                });
+                const result = await res.json();
+
+                if (result.status === 'success') {
+                    const u = result.user;
+                    const s = result.stats;
+
+                    document.getElementById('userName').innerText = u.name;
+                    document.getElementById('userEmail').innerText = u.email;
+                    document.getElementById('userPhone').innerText = u.phone;
+                    document.getElementById('userRef').innerText = u.refCode;
+                    document.getElementById('userJoined').innerText = new Date(u.joined).toLocaleDateString();
+                    document.getElementById('initials').innerText = u.name.charAt(0).toUpperCase();
+                    
+                    document.getElementById('statFunded').innerText = s.totalDeposit.toLocaleString();
+                    document.getElementById('statOrders').innerText = s.transCount;
+                }
+            } catch (err) {
+                console.error("Profile load error");
+            }
+        }
+
+        function logout() {
+            if (confirm("Are you sure you want to log out?")) {
+                localStorage.removeItem('XMONIE');
+                window.location.href = 'login.html';
+            }
+        }
+
+        loadProfile();
+    </script>
+</body>
+</html>
